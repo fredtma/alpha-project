@@ -1,0 +1,14 @@
+[
+  {
+    "search": "{tables}",
+    "replace": "contacts"
+  },
+  {
+    "search": "/*fields*/",
+    "replace": "$table->string('slug',40)->unique();\n$table->integer('user_id')->nullable()->unsigned();\n$table->integer('property_id')->nullable();\n$table->integer('company_id')->nullable()->unsigned();\n$table->string('contact',45)->index();\n$table->string('type',30)->default('email');\n$table->string('description',250)->nullable();\n"
+  },
+  {
+    "search": "/*foreign*/",
+    "replace": "$table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');\n$table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');\n"
+  }
+]

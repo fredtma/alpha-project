@@ -1,0 +1,366 @@
+{
+  "type":"object",
+  "title":"International Prepaid Vending",
+  "properties":{
+    "mail":{
+      "driver":"smtp",
+      "host":"smtp.sendgrid.net",
+      "port":587,
+      "username":"fredtma",
+      "password":"zxasqw1212",
+      "encryption":null
+    },
+    "database":{
+      "database":"ipv",
+      "user":"homestead",
+      "password":"secret",
+      "host":"127.0.0.1",
+      "port": 33060
+    },
+    "system":{},
+    "tables":{
+      "items":
+      [
+        {
+          "name":"companies",
+          "request":{"label":{"franchise":{"label":"Franchise/Company"}}},
+          "fields":[
+            {"name":"id","type":"integer", "children":["users","adverts","addresses","contacts","transactions"]},
+            {"name":"slug","type":"string", "size":40, "validation":["unique","required"]},
+            {"name": "franchise","type": "string", "validation": ["required","index"], "default": null},
+            {"name": "name","type": "string", "validation": ["required"], "size": 45},
+            {"name": "description","type": "string", "size": 250, "default": null},
+            {"name": "type","type": "string", "size": 45, "default": "franchise"},
+            {"name": "status","type": "boolean", "default": 1}
+          ]
+        },
+        {
+          "name":"properties",
+          "fields":[
+            {"name": "id","type":"integer", "children":["addresses","meters",{"name":"users","fields":["firstname","lastname","slug"]}]},
+            {"name": "slug","type":"string", "size":40, "validation":["unique","required"]},
+            {"name": "name","type": "string", "validation": ["required","index"], "size": 45},
+            {"name": "description","type": "string", "size":250}
+          ]
+        },
+        {
+          "name":"users",
+          "migration":{
+            "skip":false,
+            "create":true
+          },
+          "request":{"label":{"firstname":{"label":"First name"}, "lastname":{"label":"Last name"}}},
+          "fields":[
+            {"name":"id", "type":"integer", "children":[ {"name":"accounts","fields":["name","slug"]}, "adverts", "addresses", "contacts", "meters", "request", "sundries"], "gerund":[{"name":"permissions","link":"link_perm_users"}]},
+            {"name":"slug","type":"string", "size":40, "validation":["unique","required"]},
+            {"name":"company_id","type":"integer","join":["companies","id"], "validation":["required"]},
+            {"name":"landlord_id","type":"integer","join":["users","id"]},
+            {"name":"property_id","type":"integer","join":["properties","id"]},
+            {"name":"active","type":"boolean", "default":0},
+            {"name":"permissions","type":"string", "size":180},
+            {"name":"last_login","type":"timestamp"},
+            {"name":"firstname","type":"string", "size":45, "validation":["required"]},
+            {"name":"lastname","type":"string", "size":45, "validation":["required"]},
+            {"name":"email","type":"string", "size":45, "validation":["required","email","unique"]},
+            {"name":"password","type":"string", "size":90, "validation":["required"]},
+            {"name":"level","type":"string", "size":30,"default":"user"},
+            {"name":"remember_token","type":"string", "size":45},
+            {"name":"status","type":"boolean","default":1},
+            {"name":"log_count","type":"integer"}
+          ]
+        },
+        {
+          "name":"contacts",
+          "fields":[
+            {"name":"id","type":"integer"},
+            {"name":"slug","type":"string", "size":40, "validation":["unique","required"]},
+            {"name": "user_id","type": "integer", "join": ["users","id"]},
+            {"name": "property_id","type": "integer", "joiin": ["properties","id"]},
+            {"name": "company_id","type": "integer", "join": ["companies","id"], "default": null},
+            {"name": "contact","type": "string", "size":45, "validation": ["required","index"]},
+            {"name": "type","type": "string", "size":30, "validation": ["required"], "default": "email"},
+            {"name": "description","type": "string", "size":250}
+          ]
+        },
+        {
+          "name":"addresses",
+          "fields":[
+            {"name":"id","type":"integer"},
+            {"name":"slug","type":"string", "size":40, "validation":["unique","required"]},
+            {"name": "user_id","type": "integer", "join": ["users","id"]},
+            {"name":"company_id","type":"integer","join":["companies","id"]},
+            {"name":"property_id","type":"integer","join":["properties","id"]},
+            {"name": "type","type": "string", "validation": ["required"], "size": 45, "default":"home"},
+            {"name": "description","type": "string", "validation": [], "size": 45},
+            {"name": "street","type": "string", "validation": ["required"], "size": 45},
+            {"name": "building","type": "string", "validation": [], "size": 45},
+            {"name": "number","type": "integer"},
+            {"name": "suburb","type": "string", "size": 45},
+            {"name": "city","type": "string", "validation": ["required","index"], "size": 45},
+            {"name": "region","type": "string", "validation": [], "size": 45},
+            {"name": "post_code","type": "string", "validation": [], "size": 15},
+            {"name": "country","type": "string", "validation": ["required","index"], "size": 60}
+          ]
+        },
+        {
+          "name":"permissions",
+          "fields":[
+            {"name":"id","type":"integer", "gerund":[{"table":"users","link":"link_perm_users"},{"table":"groups","link":"link_perm_groups"}]},
+            {"name":"id","type":"integer"},
+            {"name":"slug","type":"string", "size":40, "validation":["unique","required"]},
+            {"name": "name","type": "string", "validation": ["required","index"], "size":45},
+            {"name": "description","type": "string", "validation": [], "size":250},
+            {"name": "status","type": "boolean", "default": 1}
+          ]
+        },
+        {
+          "name":"groups",
+          "fields":[
+            {"name":"id","type":"integer", "gerund":[{"table":"permissions","link":"link_perm_groups"}]},
+            {"name":"slug","type":"string", "size":40, "validation":["unique","required"]},
+            {"name": "name","type": "string", "validation": ["required","index"], "size":45},
+            {"name": "description","type": "string", "validation": [], "size":250},
+            {"name": "status","type": "boolean", "default": 1}
+          ]
+        },
+        {
+          "name":"link_perm_users",
+          "fields":[
+            {"name":"id","type":"integer"},
+            {"name":"slug","type":"string", "size":40, "validation":["unique","required"]},
+            {"name":"permission_id","type":"integer","join":["permissions","id"], "validation":["required"]},
+            {"name":"permission_name","type":"string","size":45},
+            {"name":"user_id","type":"integer","join":["users","id"], "validation":["required"]},
+            {"name":"user_name","type":"string","size":45},
+            {"name": "description","type": "string", "size": 25}
+          ]
+        },
+        {
+          "name":"link_perm_groups",
+          "fields":[
+            {"name":"id","type":"integer"},
+            {"name":"slug","type":"string", "size":40, "validation":["unique","required"]},
+            {"name":"permission_id","type":"integer","join":["permissions","id"], "validation":["required"]},
+            {"name":"permission_name","type":"string","size":45},
+            {"name":"group_id","type":"integer","join":["groups","id"], "validation":["required"]},
+            {"name":"group_name","type":"string","size":45},
+            {"name": "description","type": "string", "size": 25}
+          ]
+        },
+        {
+          "name":"link_group_users",
+          "fields":[
+            {"name":"id","type":"integer"},
+            {"name":"slug","type":"string", "size":40, "validation":["unique","required"]},
+            {"name":"group_id","type":"integer","join":["groups","id"], "validation":["required"]},
+            {"name":"group_name","type":"string","size":45},
+            {"name":"user_id","type":"integer","join":["users","id"], "validation":["required"]},
+            {"name":"user_name","type":"string","size":45},
+            {"name": "description","type": "string", "size": 25}
+          ]
+        },
+        {
+          "name":"adverts",
+          "fields":[
+            {"name": "id","type":"integer"},
+            {"name": "slug","type":"string", "size":40, "validation":["unique","required"]},
+            {"name": "company_id","type": "integer", "join": ["companies","id"], "validation":["required"]},
+            {"name": "user_id","type": "integer", "join": ["users","id"], "validation":["required"]},
+            {"name": "name","type": "string", "validation": ["required"], "size": 60},
+            {"name": "description","type": "text", "validation": ["required"]},
+            {"name": "image_path","type": "string", "size": 255, "default": null},
+            {"name": "date_start","type": "dateTime", "validation": ["required"], "default": null},
+            {"name": "date_end","type": "dateTime", "validation": ["required"], "default": null}
+          ]
+        },
+        {
+          "name":"accounts",
+          "fields":[
+            {"name": "id","type":"integer", "children":["transactions"]},
+            {"name":"id","type":"integer"},
+            {"name":"slug","type":"string", "size":40, "validation":["unique","required"]},
+            {"name": "user_id","type": "integer", "join": ["users","id"]},
+            {"name": "company_id","type": "integer", "join": ["companies","id"], "default": null},
+            {"name": "name","type": "string", "validation": ["required"], "default": null, "size": 45},
+            {"name": "account_number","type": "string", "validation": ["required"], "default": null, "size": 45},
+            {"name": "type","type": "string", "validation": ["required"], "default": null, "size": 30},
+            {"name": "description","type": "string", "validation": [], "default": null, "size": 245},
+            {"name": "balance","type": "decimal", "validation": ["required"], "size": 10},
+            {"name": "outstanding","type": "decimal", "validation": [], "size": 10}
+          ]
+        },
+        {
+          "name":"sundries",
+          "fields":[
+            {"name":"id","type":"integer"},
+            {"name":"slug","type":"string", "size":40, "validation":["unique","required"]},
+            {"name": "user_id","type": "integer", "join": ["users","id"], "validation":["required"]},
+            {"name": "name","type": "string", "validation": ["required"], "default": null, "size": 45},
+            {"name": "account_number","type": "string", "validation": ["required"], "default": null, "size": 45},
+            {"name": "type","type": "string", "validation": ["required"], "default": null, "size": 30},
+            {"name": "description","type": "string", "validation": [], "default": null, "size": 245},
+            {"name": "balance","type": "decimal", "validation": ["required"], "size": 10},
+            {"name": "outstanding","type": "decimal", "validation": [], "size": 10},
+            {"name": "date_to_pay","type": "dateTime", "validation": [], "default": null},
+            {"name": "recurring","type": "boolean", "validation": [], "default": 0}
+          ]
+        },
+        {
+          "name":"meters",
+          "fields":[
+            {"name":"id","type":"integer", "children":["transaction"]},
+            {"name":"slug","type":"string", "size":40, "validation":["unique","required"]},
+            {"name": "property_id","type": "integer", "join":["properties","id"], "validation":["required"]},
+            {"name": "company_id","type": "integer", "join": ["companies","id"], "default": null},
+            {"name": "user_id","type": "integer", "join": ["users","id"], "default": null},
+            {"name": "name","type": "string", "validation": [], "default": null},
+            {"name": "type","type": "string", "validation": ["required"], "size": 45},
+            {"name": "value","type": "integer", "validation": ["required"], "default": 0},
+            {"name": "capacity","type": "integer", "validation": ["required"], "default": 0},
+            {"name": "current_capacity","type": "integer", "validation": [], "default": 0},
+            {"name": "status","type": "boolean", "validation":  [], "default": 1}
+          ]
+        },
+        {
+          "name":"transactions",
+          "fields":[
+            {"name":"id","type":"integer"},
+            {"name":"slug","type":"string", "size":40, "validation":["unique","required"]},
+            {"name": "account_id","type": "integer", "join": ["accounts","id"]},
+            {"name": "sundry_id","type": "integer", "join": ["sundries","id"], "default": null},
+            {"name": "meter_id","type": "integer", "join": ["meters","id"], "default": null},
+            {"name": "company_id","type": "integer", "join": ["companies","id"], "default": null},
+            {"name": "amount","type": "decimal", "validation": ["required"], "size": 10},
+            {"name": "reference","type": "string", "validation": ["required"], "default": null, "size": 45},
+            {"name": "type","type": "string", "validation": ["required"], "default": null},
+            {"name": "description","type": "string", "size":250, "default": null}
+          ]
+        },
+        {
+          "name":"faults",
+          "fields":[
+            {"name":"id","type":"integer","children":["requests"]},
+            {"name":"slug","type":"string", "size":40, "validation":["unique","required"]},
+            {"name": "name","type": "string", "validation": ["required"], "size": 45},
+            {"name": "type","type": "string", "validation": ["required"], "size": 45},
+            {"name": "description","type": "text", "validation": [], "default": null},
+            {"name": "solution","type": "text", "validation": [], "default": null}
+          ]
+        },
+        {
+          "name":"requests",
+          "fields":[
+            {"name":"id","type":"integer"},
+            {"name": "user_id","type": "integer", "join": ["users","id"], "validation":["required"]},
+            {"name":"slug","type":"string", "size":40, "validation":["unique","required"]},
+            {"name": "meter_id","type": "integer", "join": ["meters","id"]},
+            {"name": "fault_id","type": "integer", "join": ["faults","id"]},
+            {"name": "name","type": "string", "validation": ["required"], "size": 45},
+            {"name": "type","type": "string", "validation": [], "size": 45},
+            {"name": "quantity","type": "integer", "validation": [], "default": null},
+            {"name": "description","type": "string", "validation": ["required"], "size": 250}
+          ]
+        },
+        {
+          "name":"tariffs",
+          "fields":[
+            {"name":"id","type":"integer","children":["meters"]},
+            {"name":"slug","type":"string", "size":40, "validation":["unique","required"]},
+            {"name": "name","type": "string", "validation": ["required"], "size": 45},
+            {"name": "description","type": "string", "validation": [], "size": 245},
+            {"name": "version","type": "decimal", "validation": [], "size": 10},
+            {"name": "expiry","type": "date", "validation": [], "default": null},
+            {"name": "mode","type": "string", "validation": [], "size": 45},
+            {"name": "type","type": "string", "validation": [], "size": 45},
+            {"name": "amount","type": "decimal", "validation": [], "size": 10}
+          ]
+        },
+        {
+          "name":"logs",
+          "fields":[
+            {"name":"id","type":"integer"},
+            {"name":"slug","type":"string", "size":40, "validation":["unique","required"]},
+            {"name": "user_id","type": "integer", "join": ["users","id"]},
+            {"name": "channel","type": "string", "validation": ["required"], "size": 45},
+            {"name": "message","type": "text", "validation": ["required"]},
+            {"name": "level","type": "integer", "validation": ["required"]},
+            {"name": "level_name","type": "string", "validation": [], "size": 45},
+            {"name": "data","type": "json", "validation": []},
+            {"name": "formatted","type": "string", "validation": [], "size": 250}
+          ]
+        },
+        {
+          "name":"system",
+          "fields":[
+            {"name":"id","type":"integer"},
+            {"name":"slug","type":"string", "size":40, "validation":["unique","required"]},
+            {"name": "name","type": "string", "validation": ["required"], "size": 45},
+            {"name": "type","type": "string", "size": 45},
+            {"name": "description","type": "text", "validation": []},
+            {"name": "data","type": "json", "validation": []}
+          ]
+        },
+        {
+          "name":"activations",
+          "fields":[
+            {"name": "user_id","type": "integer", "join": ["users","id"], "validation":["required"]},
+            {"name":"code", "type":"string", "size":30, "validation":["required"]},
+            {"name":"completed", "type":"boolean", "default":0},
+            {"name":"completed_at", "type":"timestamp", "validation":["required"]}
+          ]
+        },
+        {
+          "name":"email",
+          "fields":[
+            {"name":"recipient", "type":"string", "size":"60", "validation":["required"]},
+            {"name":"email", "type":"string", "size":"60", "validation":["required","email"]},
+            {"name":"template", "type":"string", "size":"90", "validation":["required"]},
+            {"name":"json", "type":"json", "validation":["required"]},
+            {"name":"attempt", "type":"integer", "validation":["required"]},
+            {"name":"error", "type":"text"}
+          ]
+        },
+        {
+          "name":"persistences",
+          "fields":[
+            {"name": "user_id","type": "integer", "join": ["users","id"]},
+            {"name":"code", "type":"string", "size":"150", "validation":["required","index"]}
+          ]
+        },
+        {
+          "name":"reminders",
+          "fields":[
+            {"name": "user_id","type": "integer", "join": ["users","id"]},
+            {"name":"code", "type":"string", "validation":["required"]},
+            {"name":"completed", "type":"boolean", "default":0},
+            {"name":"completed_at", "type":"timestamp", "validation":["required"]}
+          ]
+        },
+        {
+          "name":"throttle",
+          "fields":[
+            {"name": "user_id","type": "integer", "join": ["users","id"]},
+            {"name":"type", "type":"string", "size":"90", "validation":["required"]},
+            {"name":"ip", "type":"string", "size":"30", "validation":["required"]}
+          ]
+        },
+        {
+          "name":"roles",
+          "fields":[
+            {"name":"id","type":"integer"},
+            {"name":"slug","type":"string", "size":40, "validation":["unique","required"]},
+            {"name":"name", "type":"string", "size":"45", "validation":["required"]},
+            {"name":"permissions", "type":"string", "size":"45", "validation":["required"]}
+          ]
+        },
+        {
+          "name":"role_users",
+          "fields":[
+            {"name":"role_id","type":"integer"},
+            {"name":"user_id","type":"integer"}
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,1 @@
+[{"search":"{tables}","replace":"faults"},{"search":"/*fields*/","replace":"$table->string('slug',40)->unique();\n$table->string('name',45);\n$table->string('type',45);\n$table->text('description')->nullable();\n$table->text('solution')->nullable();\n"},{"search":"/*foreign*/","replace":""}]

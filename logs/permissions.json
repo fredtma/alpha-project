@@ -1,0 +1,1 @@
+[{"search":"{tables}","replace":"permissions"},{"search":"/*fields*/","replace":"$table->string('slug',40)->unique();\n$table->string('name',45)->index();\n$table->string('description',250)->nullable();\n$table->boolean('status')->default('1')->nullable();\n"},{"search":"/*foreign*/","replace":""}]

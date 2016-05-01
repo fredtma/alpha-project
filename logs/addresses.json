@@ -1,0 +1,14 @@
+[
+  {
+    "search": "{tables}",
+    "replace": "addresses"
+  },
+  {
+    "search": "/*fields*/",
+    "replace": "$table->string('slug',40)->unique();\n$table->integer('user_id')->nullable()->unsigned();\n$table->integer('company_id')->nullable()->unsigned();\n$table->integer('property_id')->nullable()->unsigned();\n$table->string('type',45)->default('home');\n$table->string('description',45)->nullable();\n$table->string('street',45);\n$table->string('building',45)->nullable();\n$table->integer('number')->nullable();\n$table->string('suburb',45)->nullable();\n$table->string('city',45)->index();\n$table->string('region',45)->nullable();\n$table->string('post_code',15)->nullable();\n$table->string('country',60)->index();\n"
+  },
+  {
+    "search": "/*foreign*/",
+    "replace": "$table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');\n$table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');\n$table->foreign('property_id')->references('id')->on('properties')->onDelete('cascade');\n"
+  }
+]

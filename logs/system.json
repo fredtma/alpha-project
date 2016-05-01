@@ -1,0 +1,1 @@
+[{"search":"{tables}","replace":"system"},{"search":"/*fields*/","replace":"$table->string('slug',40)->unique();\n$table->string('name',45);\n$table->string('type',45)->nullable();\n$table->text('description')->nullable();\n$table->json('data')->nullable();\n"},{"search":"/*foreign*/","replace":""}]
